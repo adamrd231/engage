@@ -8,59 +8,55 @@
 import SwiftUI
 import SwiftData
 
+struct StopwatchFormatView: View {
+    let minutes: Int
+    let seconds: Int
+    var body: some View {
+        if minutes < 10 {
+            if seconds < 10 {
+                Text("0\(minutes)m: 0\(seconds)s")
+            } else {
+                Text("0\(minutes)m: \(seconds)s")
+            }
+           
+        } else {
+            if seconds < 10 {
+                Text("\(minutes)m: 0\(seconds)s")
+            } else {
+                Text("\(minutes)m: \(seconds)s")
+            }
+            
+        }
+    }
+}
+
 struct TimeSelectionView: View {
     let title: String
     @Binding var minutes: Int
     @Binding var seconds: Int
-    @State var isOpen: Bool = false
     
     var body: some View {
-        if isOpen {
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Time in Round")
-                    Spacer()
-                    Text("\(minutes): \(seconds)")
-                }
-                .onTapGesture(perform: {
-                    withAnimation {
-                        isOpen.toggle()
-                    }
-                })
-      
-                
-                HStack {
-                    Picker("", selection: $minutes) {
-                        ForEach(0..<60, id: \.self) { minutes in
-                            Text(minutes, format: .number)
-                                .tag(minutes)
-                        }
-                    }
-                    .pickerStyle(.wheel)
-                    Text("min")
-                    Picker("", selection: $seconds) {
-                        ForEach(0..<60, id: \.self) { seconds in
-                            HStack {
-                                Text(seconds, format: .number)
-                                    .tag(seconds)
-                            }
-                        }
-                    }
-                    .pickerStyle(WheelPickerStyle())
-                    Text("sec")
-                }
-            }
-        } else {
+        VStack(alignment: .leading) {
             HStack {
-                Text("Time in Round")
-                Spacer()
-                Button("\(minutes): \(seconds)") {
-                    withAnimation {
-                        isOpen.toggle()
+                Picker("", selection: $minutes) {
+                    ForEach(0..<60, id: \.self) { minutes in
+                        Text(minutes, format: .number)
+                            .tag(minutes)
                     }
                 }
+                .pickerStyle(.wheel)
+                Text("min")
+                Picker("", selection: $seconds) {
+                    ForEach(0..<60, id: \.self) { seconds in
+                        HStack {
+                            Text(seconds, format: .number)
+                                .tag(seconds)
+                        }
+                    }
+                }
+                .pickerStyle(WheelPickerStyle())
+                Text("sec")
             }
-            
         }
     }
 }
@@ -75,11 +71,34 @@ struct ContentView: View {
     @State var restMinutes: Int = 0
     @State var restSeconds: Int = 0
     @State var rounds: Int = 5
+    @State var isUpdatingTime: Bool = false
+    @State var isUpdatingRest: Bool = false
     
     var body: some View {
         NavigationSplitView {
             List {
+                
                 Section {
+                    DisclosureGroup(isExpanded: $isUpdatingTime) {
+                        TimeSelectionView(title: "Time in Round", minutes: $roundMinutes, seconds: $roundSeconds)
+                    } label: {
+                        HStack {
+                            Image(systemName: "timer")
+                            Text("Time in Round")
+                            Spacer()
+                            StopwatchFormatView(minutes: roundMinutes, seconds: roundSeconds)
+                        }
+                    }
+                    DisclosureGroup(isExpanded: $isUpdatingRest) {
+                        TimeSelectionView(title: "Time in Round", minutes: $restMinutes, seconds: $restSeconds)
+                    } label: {
+                        HStack {
+                            Image(systemName: "clock.arrow.circlepath")
+                            Text("Rest time")
+                            Spacer()
+                            StopwatchFormatView(minutes: restMinutes, seconds: restSeconds)
+                        }
+                    }
                     HStack {
                         Text("# of rounds")
                         Spacer()
@@ -89,6 +108,7 @@ struct ContentView: View {
                             }
                         }
                     }
+                
                     TimeSelectionView(title: "Time in Round", minutes: $roundMinutes, seconds: $roundSeconds)
                     HStack {
                         Text("Rest")
@@ -139,9 +159,7 @@ struct ContentView: View {
                         Text(timer.time, format: .number)
                     }
                 }
-                .listStyle(SidebarListStyle())
             }
-            
 
 #if os(macOS)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
@@ -177,5 +195,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .modelContainer(for: EngageTimer.self, inMemory: true)
-        .preferredColorScheme(.dark)
+
 }
