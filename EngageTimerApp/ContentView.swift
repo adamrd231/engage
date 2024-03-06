@@ -74,6 +74,7 @@ struct ContentView: View {
     
     @State var restMinutes: Int = 0
     @State var restSeconds: Int = 0
+    @State var rounds: Int = 5
     
     var body: some View {
         NavigationSplitView {
@@ -82,7 +83,11 @@ struct ContentView: View {
                     HStack {
                         Text("# of rounds")
                         Spacer()
-                        Text("Clap >")
+                        Picker("", selection: $rounds) {
+                            ForEach(0..<25) { number in
+                                Text(number, format: .number)
+                            }
+                        }
                     }
                     TimeSelectionView(title: "Time in Round", minutes: $roundMinutes, seconds: $roundSeconds)
                     HStack {
@@ -105,7 +110,7 @@ struct ContentView: View {
                             Circle()
                                 .foregroundStyle(.red)
                                 .opacity(0.3)
-                            Text("Cancel")
+                            Text("Reset")
                                 .foregroundStyle(.red)
                                 .fontWeight(.bold)
                         }
