@@ -14,16 +14,16 @@ struct StopwatchFormatView: View {
     var body: some View {
         if minutes < 10 {
             if seconds < 10 {
-                Text("0\(minutes)m: 0\(seconds)s")
+                Text("0\(minutes): 0\(seconds)")
             } else {
-                Text("0\(minutes)m: \(seconds)s")
+                Text("0\(minutes): \(seconds)")
             }
            
         } else {
             if seconds < 10 {
-                Text("\(minutes)m: 0\(seconds)s")
+                Text("\(minutes): 0\(seconds)")
             } else {
-                Text("\(minutes)m: \(seconds)s")
+                Text("\(minutes): \(seconds)")
             }
             
         }
@@ -109,12 +109,6 @@ struct ContentView: View {
                         }
                     }
                 
-                    TimeSelectionView(title: "Time in Round", minutes: $roundMinutes, seconds: $roundSeconds)
-                    HStack {
-                        Text("Rest")
-                        Spacer()
-                        Text("Clap >")
-                    }
                     HStack {
                         Text("Sound")
                         Spacer()
@@ -124,39 +118,37 @@ struct ContentView: View {
                 
                 HStack {
                     Button {
-                        
+                        // TODO: Bring to another page, start timer
                     } label: {
                         ZStack {
-                            Circle()
-                                .foregroundStyle(.red)
-                                .opacity(0.3)
-                            Text("Reset")
-                                .foregroundStyle(.red)
-                                .fontWeight(.bold)
-                        }
-                    }
-                    .frame(width: 100, height: 100)
-                    Spacer()
-                    Button {
-                        
-                    } label: {
-                        ZStack {
-                            Circle()
+                            Capsule()
                                 .foregroundStyle(.green)
                                 .opacity(0.3)
                             Text("Start")
+                                .padding(.vertical)
                                 .foregroundStyle(.green)
                                 .fontWeight(.bold)
                         }
                     }
-                    .frame(width: 100, height: 100)
                 }
                 .listRowBackground(Color.clear)
                 
                 Section(header: Text("Timers")) {
-                    Text("Hello")
                     ForEach(engageTimer, id: \.id) { timer in
-                        Text(timer.time, format: .number)
+                        VStack(alignment: .leading) {
+                            Text("Name of timer")
+                                .font(.caption)
+                            HStack {
+                                Text("Time in round")
+                                Spacer()
+                                Text(timer.time, format: .number)
+                            }
+                            HStack {
+                                Text("Rest time")
+                                Spacer()
+                                Text(timer.restBetweenRounds, format: .number)
+                            }
+                        }
                     }
                 }
             }
@@ -169,22 +161,9 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add timer") {
-                        let newTimer = EngageTimer(
-                            rounds: 5,
-                            time: 10,
-                            restBetweenRounds: 3,
-                            sound: "",
-                            lowBoundaryInterval: 5,
-                            highBoundaryInterval: 20
-                        )
-                        modelContext.insert(newTimer)
-                    }
-                }
 #endif
             }
-            .navigationTitle("Create Timer")
+            .navigationTitle("Engage Timer")
         } detail: {
             Text("Select an item")
         }
